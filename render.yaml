@@ -41,7 +41,7 @@ services:
       - key: VITE_API_URL
         value: https://autotask-backend.onrender.com/api
       - key: VITE_GOOGLE_CLIENT_ID
-        sync: false
+        value: 616889383289-59ljvqin4boq7p3h04u4mlh3bsf5ol7p.apps.googleusercontent.com
 
 databases:
   - name: autotask-db
