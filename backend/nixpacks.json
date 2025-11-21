@@ -1,0 +1,20 @@
+{
+  "phases": {
+    "setup": {
+      "nixPkgs": ["nodejs_20"]
+    },
+    "install": {
+      "cmds": ["npm install --legacy-peer-deps --prefer-offline --no-audit"]
+    },
+    "build": {
+      "cmds": ["npx prisma generate"]
+    }
+  },
+  "start": {
+    "cmd": "npx prisma migrate deploy && npm start"
+  },
+  "variables": {
+    "NPM_CONFIG_CACHE": "/tmp/npm-cache",
+    "NIXPACKS_NO_CACHE": "1"
+  }
+}
