@@ -32,7 +32,6 @@ services:
   - type: web
     name: autotask-frontend
     runtime: static
-    region: singapore
     plan: free
     rootDir: frontend
     buildCommand: npm ci && npm run build
