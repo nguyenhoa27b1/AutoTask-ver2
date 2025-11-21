@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum TaskStatus {
+  PENDING
+  OVERDUE
+  COMPLETED
+}
+
+model User {
+  id                     String   @id @default(uuid())
+  googleId               String   @unique @map("google_id")
+  email                  String   @unique
+  name                   String?
+  avatar                 String?
+  role                   Role     @default(USER)
+  isActive               Boolean  @default(false) @map("is_active")
+  score                  Int      @default(0)
+  completedOnTimeCount   Int      @default(0) @map("completed_on_time_count")
+  completedLateCount     Int      @default(0) @map("completed_late_count")
+  incompleteCount        Int      @default(0) @map("incomplete_count")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  assignedTasks          Task[]   @relation("AssignedTasks")
+  createdTasks           Task[]   @relation("CreatedTasks")
+
+  @@map("users")
+}
+
+model Task {
+  id                String      @id @default(uuid())
+  title             String
+  description       String?     @db.Text
+  adminId           String      @map("admin_id")
+  assignedUserId    String      @map("assigned_user_id")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  deadline          DateTime
+  status            TaskStatus  @default(PENDING)
+  completedAt       DateTime?   @map("completed_at")
+  score             Int?        @db.Integer
+  isDeleted         Boolean     @default(false) @map("is_deleted")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  admin             User        @relation("CreatedTasks", fields: [adminId], references: [id], onDelete: Cascade)
+  assignedUser      User        @relation("AssignedTasks", fields: [assignedUserId], references: [id], onDelete: Cascade)
+  files             TaskFile[]
+
+  @@index([assignedUserId])
+  @@index([adminId])
+  @@index([status])
+  @@index([deadline])
+  @@index([isDeleted])
+  @@map("tasks")
+}
+
+model TaskFile {
+  id        String   @id @default(uuid())
+  taskId    String   @map("task_id")
+  fileUrl   String   @map("file_url")
+  fileName  String   @map("file_name")
+  fileSize  Int      @map("file_size")
+  mimeType  String   @map("mime_type")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("task_files")
+}
